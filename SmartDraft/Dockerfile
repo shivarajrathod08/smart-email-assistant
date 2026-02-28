@@ -1,4 +1,4 @@
-# Stage 1: Build jar with Maven Wrapper + Java 21
+# Stage 1: Build the jar
 FROM eclipse-temurin:21-jdk AS build
 WORKDIR /app
 
@@ -6,7 +6,7 @@ WORKDIR /app
 COPY .mvn/ .mvn/
 COPY mvnw pom.xml ./
 
-# Give execute permission to mvnw
+# Give execute permission to Maven Wrapper
 RUN chmod +x mvnw
 
 # Download dependencies (cacheable layer)
@@ -22,11 +22,11 @@ RUN ./mvnw clean package -DskipTests
 FROM eclipse-temurin:21-jdk
 WORKDIR /app
 
-# Copy the jar from build stage
+# Copy built jar from build stage
 COPY --from=build /app/target/SmartDraft-0.0.1-SNAPSHOT.jar app.jar
 
 # Expose Render port
 EXPOSE 10000
 
-# Run Spring Boot on Render's port
-ENTRYPOINT ["java", "-Dserver.port=$PORT", "-jar", "app.jar"]
+# Run Spring Boot on Render's dynamic port
+ENTRYPOINT java -Dserver.port=${PORT:-10000} -jar app.jar
