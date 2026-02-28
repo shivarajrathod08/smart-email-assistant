@@ -1,23 +1,29 @@
-# Stage 1: Build jar with Maven + Java 21 (used only for reference; already built locally if desired)
+# Stage 1: Build jar with Maven Wrapper + Java 21
 FROM eclipse-temurin:21-jdk AS build
 WORKDIR /app
 
-# If you want Render to build jar, uncomment these lines
-# COPY .mvn/ .mvn/
-# COPY mvnw pom.xml ./
-# RUN ./mvnw clean package -DskipTests
-# COPY src ./src
-# RUN ./mvnw clean package -DskipTests
+# Copy Maven Wrapper and pom.xml
+COPY .mvn/ .mvn/
+COPY mvnw pom.xml ./
+
+# Download dependencies (cacheable layer)
+RUN ./mvnw dependency:go-offline -B
+
+# Copy source code
+COPY src ./src
+
+# Build the jar
+RUN ./mvnw clean package -DskipTests
 
 # Stage 2: Run app
 FROM eclipse-temurin:21-jdk
 WORKDIR /app
 
-# Copy your locally built jar
-COPY target/SmartDraft-0.0.1-SNAPSHOT.jar app.jar
+# Copy the jar from build stage
+COPY --from=build /app/target/SmartDraft-0.0.1-SNAPSHOT.jar app.jar
 
 # Expose Render port
 EXPOSE 10000
 
-# Run Spring Boot using Render's $PORT
+# Run Spring Boot on Render's port
 ENTRYPOINT ["java", "-Dserver.port=$PORT", "-jar", "app.jar"]
