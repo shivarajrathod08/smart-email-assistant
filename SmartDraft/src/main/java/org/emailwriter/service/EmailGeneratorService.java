@@ -46,7 +46,7 @@ public class EmailGeneratorService {
                 .retrieve()
                 .bodyToMono(String.class)
                 .map(this::extractResponseContent)
-                .onErrorReturn("Error: Unable to call Gemini API (no valid key).");
+                .onErrorResume(e -> Mono.just("REAL ERROR: " + e.getMessage()));
     }
 
     private String extractResponseContent(String response) {
