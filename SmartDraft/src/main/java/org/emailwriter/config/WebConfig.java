@@ -10,13 +10,14 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                // Use allowedOriginPatterns instead of allowedOrigins
                 .allowedOriginPatterns(
+                        "http://localhost:5173", // Local Vite dev server
                         "https://smart-email-app.vercel.app",
+                        "https://smart-email-app-shivarajrathod08s-projects.vercel.app", // <--- ADD THIS
                         "https://smart-email-assistant-1-xn8a.vercel.app"
                 )
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                .allowedHeaders("*") // headers wildcard is fine
-                .allowCredentials(true); // allow cookies/auth
+                .allowedHeaders("*")
+                .allowCredentials(true);
     }
 }
