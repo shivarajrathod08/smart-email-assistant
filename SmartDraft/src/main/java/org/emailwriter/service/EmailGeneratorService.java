@@ -30,9 +30,11 @@ public class EmailGeneratorService {
     public Mono<String> generateEmailReply(EmailRequest emailRequest) {
         String prompt = buildPrompt(emailRequest);
 
-        // ✅ Correct request format for Gemini 2.5
+        //  Correct request body format for Gemini 2.5
         Map<String, Object> requestBody = Map.of(
-                "input", prompt,
+                "prompt", new Object[]{
+                        Map.of("text", prompt)
+                },
                 "temperature", 0.7,
                 "maxOutputTokens", 512
         );
@@ -47,12 +49,16 @@ public class EmailGeneratorService {
                 .onErrorResume(e -> Mono.just("REAL ERROR: " + e.getMessage()));
     }
 
-    // ✅ Updated to parse the correct response
     private String extractResponseContent(String response) {
         try {
             ObjectMapper mapper = new ObjectMapper();
             JsonNode rootNode = mapper.readTree(response);
-            return rootNode.path("output").asText(); // "output" is the new field returned by Gemini
+
+            // In Gemini 2.5, the generated text is under "candidates[0].output"
+            return rootNode.path("candidates")
+                    .get(0)
+                    .path("output")
+                    .asText();
         } catch (Exception e) {
             return "Error processing request: " + e.getMessage();
         }
