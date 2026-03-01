@@ -10,10 +10,13 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                // This replaces allowedOrigins and fixes the 500 error conflict
-                .allowedOriginPatterns("*")
+                // Use allowedOriginPatterns instead of allowedOrigins
+                .allowedOriginPatterns(
+                        "https://smart-email-app.vercel.app",
+                        "https://smart-email-assistant-1-xn8a.vercel.app"
+                )
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                .allowedHeaders("*")
-                .allowCredentials(true);
+                .allowedHeaders("*") // headers wildcard is fine
+                .allowCredentials(true); // allow cookies/auth
     }
 }

@@ -6,41 +6,47 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <!-- Spring Boot parent -->
+    <!-- Spring Boot Parent -->
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>3.2.2</version>
-        <relativePath/> <!-- lookup parent from repository -->
+        <relativePath/>
     </parent>
 
-    <!-- Project coordinates -->
+    <!-- Project Info -->
     <groupId>org.email-writer</groupId>
     <artifactId>SmartDraft</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>SmartDraft</name>
     <description>SmartDraft - Smart Email Assistant</description>
 
-    <!-- Java version -->
+    <!-- Java Version -->
     <properties>
         <java.version>17</java.version>
     </properties>
 
-    <!-- Dependencies -->
     <dependencies>
-        <!-- Reactive Web (WebFlux) -->
+
+        <!-- Spring MVC (Servlet stack) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <!-- Spring WebFlux for reactive Mono/Flux -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webflux</artifactId>
         </dependency>
 
-        <!-- Jackson for JSON -->
+        <!-- Jackson (JSON support) -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
         </dependency>
 
-        <!-- Lombok (optional, for boilerplate reduction) -->
+        <!-- Lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
@@ -53,23 +59,13 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>io.projectreactor</groupId>
-            <artifactId>reactor-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
 
     </dependencies>
 
-    <!-- Build plugins -->
     <build>
         <plugins>
-            <!-- Compiler plugin -->
+
+            <!-- Compiler Plugin -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -85,7 +81,7 @@
                 </configuration>
             </plugin>
 
-            <!-- Spring Boot plugin -->
+            <!-- Spring Boot Plugin -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
@@ -98,6 +94,7 @@
                     </excludes>
                 </configuration>
             </plugin>
+
         </plugins>
     </build>
 

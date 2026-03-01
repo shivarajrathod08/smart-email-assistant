@@ -10,15 +10,12 @@ import reactor.core.publisher.Mono;
 @RestController
 @RequestMapping("/api/email")
 @AllArgsConstructor
-@CrossOrigin(origins="*")
 public class EmailGeneratorController {
 
     private final EmailGeneratorService emailGeneratorService;
+
     @PostMapping("/generate")
     public Mono<ResponseEntity<String>> generateEmail(@RequestBody EmailRequest emailRequest){
-        //  String response = emailGeneratorService.generateEmailReply(emailRequest);
-        //  return ResponseEntity.ok(response);
-
         return emailGeneratorService.generateEmailReply(emailRequest)
                 .map(ResponseEntity::ok);
     }
