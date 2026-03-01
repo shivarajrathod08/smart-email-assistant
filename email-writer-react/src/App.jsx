@@ -14,7 +14,7 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  //  CORRECT for Vite
+  // Backend URL from Vite environment variables
   const backendURL = import.meta.env.VITE_API_URL;
 
   const handleSubmit = async () => {
@@ -28,9 +28,11 @@ function App() {
     setGeneratedReply('');
 
     try {
+      // Send correct field names expected by backend
       const response = await axios.post(
         `${backendURL}/api/email/generate`,
-        { emailContent, tone }
+        { originalEmailContent: emailContent, tone },
+        { withCredentials: true } // only needed if backend uses cookies/auth
       );
 
       setGeneratedReply(
