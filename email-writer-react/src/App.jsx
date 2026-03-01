@@ -1,6 +1,10 @@
 import { useState } from 'react'
 import './App.css'
-import { Box, Button, CircularProgress, Container, FormControl, InputLabel, MenuItem, Select, TextField, Typography } from '@mui/material';
+import { 
+  Box, Button, CircularProgress, Container, 
+  FormControl, InputLabel, MenuItem, Select, 
+  TextField, Typography 
+} from '@mui/material';
 import axios from 'axios';
 
 function App() {
@@ -10,8 +14,8 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Use the environment variable for backend URL
-  const backendURL = process.env.REACT_APP_API_URL;
+  //  CORRECT for Vite
+  const backendURL = import.meta.env.VITE_API_URL;
 
   const handleSubmit = async () => {
     if (!backendURL) {
@@ -24,17 +28,20 @@ function App() {
     setGeneratedReply('');
 
     try {
-      const response = await axios.post(`${backendURL}/api/email/generate`, {
-        emailContent,
-        tone 
-      });
+      const response = await axios.post(
+        `${backendURL}/api/email/generate`,
+        { emailContent, tone }
+      );
 
       setGeneratedReply(
-        typeof response.data === 'string' ? response.data : JSON.stringify(response.data)
+        typeof response.data === 'string'
+          ? response.data
+          : JSON.stringify(response.data)
       );
+
     } catch (err) {
-      setError('Failed to generate email reply. Please try again.');
       console.error(err);
+      setError('Failed to generate email reply. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -101,7 +108,6 @@ function App() {
             value={generatedReply}
             inputProps={{ readOnly: true }}
           />
-
           <Button
             variant='outlined'
             sx={{ mt: 2 }}
