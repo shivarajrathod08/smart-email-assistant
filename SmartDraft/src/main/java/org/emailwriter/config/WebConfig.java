@@ -12,7 +12,7 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addMapping("/**")
                 .allowedOrigins("https://smart-email-assistant-1-xn8a.vercel.app") // Your Vercel URL
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                .allowedHeaders("*")
+                .allowedHeaders("https://smart-email-app.vercel.app")
                 .allowCredentials(true);
     }
 }
