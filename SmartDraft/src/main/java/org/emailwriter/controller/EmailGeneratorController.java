@@ -22,4 +22,9 @@ public class EmailGeneratorController {
         return emailGeneratorService.generateEmailReply(emailRequest)
                 .map(ResponseEntity::ok);
     }
+
+    @GetMapping("/test")
+    public ResponseEntity<String> test() {
+        return ResponseEntity.ok("API is working");
+    }
 }
