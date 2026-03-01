@@ -40,7 +40,7 @@ public class EmailGeneratorService {
         );
 
         return webClient.post()
-                .uri(geminiApiUrl)
+                .uri(geminiApiUrl + "?key=" + geminiApiKey)
                 .header("Content-Type", "application/json")
                 .header("x-goog-api-key", geminiApiKey)
                 .bodyValue(requestBody)
