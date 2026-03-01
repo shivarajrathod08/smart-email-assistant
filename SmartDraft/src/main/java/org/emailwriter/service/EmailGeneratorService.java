@@ -19,7 +19,7 @@ public class EmailGeneratorService {
 
     public EmailGeneratorService(
             WebClient.Builder webClientBuilder,
-            @Value("${GEMINI_URL:https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent}") String geminiApiUrl,
+            @Value("${GEMINI_URL:https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent}") String geminiApiUrl,
             @Value("${GEMINI_KEY:dummy-key}") String geminiApiKey) {
 
         this.webClient = webClientBuilder.build();
@@ -28,15 +28,14 @@ public class EmailGeneratorService {
     }
 
     public Mono<String> generateEmailReply(EmailRequest emailRequest) {
-
         String prompt = buildPrompt(emailRequest);
 
+        //  New request format for Gemini 2.5
         Map<String, Object> requestBody = Map.of(
-                "contents", new Object[]{
-                        Map.of("parts", new Object[]{
-                                Map.of("text", prompt)
-                        })
-                }
+                "prompt", Map.of("text", prompt),
+                "temperature", 0.7,
+                "candidate_count", 1,
+                "max_output_tokens", 512
         );
 
         return webClient.post()
@@ -49,16 +48,14 @@ public class EmailGeneratorService {
                 .onErrorResume(e -> Mono.just("REAL ERROR: " + e.getMessage()));
     }
 
+    //  Updated to parse the new Gemini response
     private String extractResponseContent(String response) {
         try {
             ObjectMapper mapper = new ObjectMapper();
             JsonNode rootNode = mapper.readTree(response);
             return rootNode.path("candidates")
                     .get(0)
-                    .path("content")
-                    .path("parts")
-                    .get(0)
-                    .path("text")
+                    .path("output")
                     .asText();
         } catch (Exception e) {
             return "Error processing request: " + e.getMessage();
