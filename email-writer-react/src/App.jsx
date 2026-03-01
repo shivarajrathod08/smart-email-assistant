@@ -56,20 +56,27 @@ function App() {
       </Typography>
 
       <Box sx={{ mx: 3 }}>
+        {/* Original Email Content */}
         <TextField 
           fullWidth
           multiline
           rows={6}
           variant='outlined'
+          id="emailContent"
+          name="emailContent"
           label="Original Email Content"
           value={emailContent}
           onChange={(e) => setEmailContent(e.target.value)}
           sx={{ mb: 2 }}
         />
 
+        {/* Tone Selection */}
         <FormControl fullWidth sx={{ mb: 2 }}>
-          <InputLabel>Tone (Optional)</InputLabel>
+          <InputLabel id="tone-label">Tone (Optional)</InputLabel>
           <Select
+            id="tone"
+            name="tone"
+            labelId="tone-label"
             value={tone}
             label="Tone (Optional)"
             onChange={(e) => setTone(e.target.value)}
@@ -81,6 +88,7 @@ function App() {
           </Select>
         </FormControl>
 
+        {/* Submit Button */}
         <Button
           variant='contained'
           onClick={handleSubmit}
@@ -91,12 +99,14 @@ function App() {
         </Button>
       </Box>
 
+      {/* Error Message */}
       {error && (
         <Typography color='error' sx={{ mt: 2 }}>
           {error}
         </Typography>
       )}
 
+      {/* Generated Reply */}
       {generatedReply && (
         <Box sx={{ mt: 3 }}>
           <Typography variant='h6' gutterBottom>
@@ -107,6 +117,8 @@ function App() {
             multiline
             rows={6}
             variant='outlined'
+            id="generatedReply"
+            name="generatedReply"
             value={generatedReply}
             inputProps={{ readOnly: true }}
           />
