@@ -1,9 +1,6 @@
-import { useState } from 'react';
-import './App.css';
-import {
-  Box, Button, CircularProgress, Container,
-  FormControl, InputLabel, MenuItem, Select, TextField, Typography
-} from '@mui/material';
+import { useState } from 'react'
+import './App.css'
+import { Box, Button, CircularProgress, Container, FormControl, InputLabel, MenuItem, Select, TextField, Typography } from '@mui/material';
 import axios from 'axios';
 
 function App() {
@@ -13,26 +10,30 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  // Use the environment variable for backend URL
+  const backendURL = process.env.REACT_APP_API_URL;
+
   const handleSubmit = async () => {
-    if (!emailContent) return;
+    if (!backendURL) {
+      setError('Backend URL is not configured.');
+      return;
+    }
 
     setLoading(true);
     setError('');
     setGeneratedReply('');
 
     try {
-      const response = await axios.post(
-        `${process.env.REACT_APP_API_URL}/api/email/generate`,
-        { emailContent, tone },
-        { headers: { 'Content-Type': 'application/json' } }
-      );
+      const response = await axios.post(`${backendURL}/api/email/generate`, {
+        emailContent,
+        tone 
+      });
 
       setGeneratedReply(
         typeof response.data === 'string' ? response.data : JSON.stringify(response.data)
       );
     } catch (err) {
-      const message = err.response?.data || err.message;
-      setError(`Failed to generate email reply: ${message}`);
+      setError('Failed to generate email reply. Please try again.');
       console.error(err);
     } finally {
       setLoading(false);
@@ -41,16 +42,16 @@ function App() {
 
   return (
     <Container maxWidth="md" sx={{ py: 4 }}>
-      <Typography variant="h3" component="h1" gutterBottom>
+      <Typography variant='h3' component="h1" gutterBottom>
         Email Reply Generator
       </Typography>
 
       <Box sx={{ mx: 3 }}>
-        <TextField
+        <TextField 
           fullWidth
           multiline
           rows={6}
-          variant="outlined"
+          variant='outlined'
           label="Original Email Content"
           value={emailContent}
           onChange={(e) => setEmailContent(e.target.value)}
@@ -72,36 +73,37 @@ function App() {
         </FormControl>
 
         <Button
-          variant="contained"
+          variant='contained'
           onClick={handleSubmit}
           disabled={!emailContent || loading}
           fullWidth
         >
-          {loading ? <CircularProgress size={24} /> : 'Generate Reply'}
+          {loading ? <CircularProgress size={24}/> : "Generate Reply"}
         </Button>
       </Box>
 
       {error && (
-        <Typography color="error" sx={{ mb: 2 }}>
+        <Typography color='error' sx={{ mt: 2 }}>
           {error}
         </Typography>
       )}
 
       {generatedReply && (
         <Box sx={{ mt: 3 }}>
-          <Typography variant="h6" gutterBottom>
+          <Typography variant='h6' gutterBottom>
             Generated Reply:
           </Typography>
           <TextField
             fullWidth
             multiline
             rows={6}
-            variant="outlined"
+            variant='outlined'
             value={generatedReply}
             inputProps={{ readOnly: true }}
           />
+
           <Button
-            variant="outlined"
+            variant='outlined'
             sx={{ mt: 2 }}
             onClick={() => navigator.clipboard.writeText(generatedReply)}
           >
@@ -110,7 +112,7 @@ function App() {
         </Box>
       )}
     </Container>
-  );
+  )
 }
 
 export default App;
