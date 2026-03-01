@@ -1,9 +1,9 @@
-import { useState } from 'react'
-import './App.css'
-import { 
-  Box, Button, CircularProgress, Container, 
-  FormControl, InputLabel, MenuItem, Select, 
-  TextField, Typography 
+import { useState } from 'react';
+import './App.css';
+import {
+  Box, Button, CircularProgress, Container,
+  FormControl, InputLabel, MenuItem, Select,
+  TextField, Typography
 } from '@mui/material';
 import axios from 'axios';
 
@@ -28,11 +28,10 @@ function App() {
     setGeneratedReply('');
 
     try {
-      // Send correct field names expected by backend
       const response = await axios.post(
         `${backendURL}/api/email/generate`,
         { originalEmailContent: emailContent, tone },
-        { withCredentials: true } // only needed if backend uses cookies/auth
+        { withCredentials: true }
       );
 
       setGeneratedReply(
@@ -40,7 +39,6 @@ function App() {
           ? response.data
           : JSON.stringify(response.data)
       );
-
     } catch (err) {
       console.error(err);
       setError('Failed to generate email reply. Please try again.');
@@ -57,14 +55,15 @@ function App() {
 
       <Box sx={{ mx: 3 }}>
         {/* Original Email Content */}
-        <TextField 
+        <TextField
+          id="emailContent"
+          name="emailContent"
+          label="Original Email Content"
+          autoComplete="off"
           fullWidth
           multiline
           rows={6}
           variant='outlined'
-          id="emailContent"
-          name="emailContent"
-          label="Original Email Content"
           value={emailContent}
           onChange={(e) => setEmailContent(e.target.value)}
           sx={{ mb: 2 }}
@@ -88,14 +87,14 @@ function App() {
           </Select>
         </FormControl>
 
-        {/* Submit Button */}
+        {/* Generate Button */}
         <Button
           variant='contained'
           onClick={handleSubmit}
           disabled={!emailContent || loading}
           fullWidth
         >
-          {loading ? <CircularProgress size={24}/> : "Generate Reply"}
+          {loading ? <CircularProgress size={24} /> : "Generate Reply"}
         </Button>
       </Box>
 
@@ -109,18 +108,16 @@ function App() {
       {/* Generated Reply */}
       {generatedReply && (
         <Box sx={{ mt: 3 }}>
-          <Typography variant='h6' gutterBottom>
-            Generated Reply:
-          </Typography>
           <TextField
+            id="generatedReply"
+            name="generatedReply"
+            label="Generated Reply"
+            value={generatedReply}
+            InputProps={{ readOnly: true }}
             fullWidth
             multiline
             rows={6}
             variant='outlined'
-            id="generatedReply"
-            name="generatedReply"
-            value={generatedReply}
-            inputProps={{ readOnly: true }}
           />
           <Button
             variant='outlined'
@@ -132,7 +129,7 @@ function App() {
         </Box>
       )}
     </Container>
-  )
+  );
 }
 
 export default App;
