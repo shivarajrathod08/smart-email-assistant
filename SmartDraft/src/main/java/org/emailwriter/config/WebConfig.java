@@ -10,10 +10,13 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("https://smart-email-assistant-1-xn8a.vercel.app") // Your Vercel URL
+                // Add BOTH your main URL and the generated Vercel URL to be safe
+                .allowedOrigins(
+                        "https://smart-email-app.vercel.app",
+                        "https://smart-email-assistant-1-xn8a.vercel.app"
+                )
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                .allowedHeaders("https://smart-email-app.vercel.app")
+                .allowedHeaders("*") // Use "*" for headers, NOT a URL
                 .allowCredentials(true);
     }
 }
-
