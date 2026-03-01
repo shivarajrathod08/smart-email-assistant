@@ -1,13 +1,14 @@
 package org.emailwriter.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.emailwriter.request.EmailRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -19,8 +20,8 @@ public class EmailGeneratorService {
 
     public EmailGeneratorService(
             WebClient.Builder webClientBuilder,
-            @Value("${GEMINI_URL:https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent}") String geminiApiUrl,
-            @Value("${GEMINI_KEY:dummy-key}") String geminiApiKey) {
+            @Value("${GEMINI_URL}") String geminiApiUrl,
+            @Value("${GEMINI_KEY}") String geminiApiKey) {
 
         this.webClient = webClientBuilder.build();
         this.geminiApiUrl = geminiApiUrl;
@@ -30,13 +31,18 @@ public class EmailGeneratorService {
     public Mono<String> generateEmailReply(EmailRequest emailRequest) {
         String prompt = buildPrompt(emailRequest);
 
-        //  Correct request body format for Gemini 2.5
+        // FIX 1: Correct Request Body Format
+        // The API requires "contents" -> "parts" -> "text"
         Map<String, Object> requestBody = Map.of(
-                "prompt", new Object[]{
-                        Map.of("text", prompt)
-                },
-                "temperature", 0.7,
-                "maxOutputTokens", 512
+                "contents", List.of(
+                        Map.of("parts", List.of(
+                                Map.of("text", prompt)
+                        ))
+                ),
+                "generationConfig", Map.of(
+                        "temperature", 0.7,
+                        "maxOutputTokens", 512
+                )
         );
 
         return webClient.post()
@@ -46,7 +52,7 @@ public class EmailGeneratorService {
                 .retrieve()
                 .bodyToMono(String.class)
                 .map(this::extractResponseContent)
-                .onErrorResume(e -> Mono.just("REAL ERROR: " + e.getMessage()));
+                .onErrorResume(e -> Mono.just("API ERROR: " + e.getMessage()));
     }
 
     private String extractResponseContent(String response) {
@@ -54,26 +60,29 @@ public class EmailGeneratorService {
             ObjectMapper mapper = new ObjectMapper();
             JsonNode rootNode = mapper.readTree(response);
 
-            // In Gemini 2.5, the generated text is under "candidates[0].output"
+            // FIX 2: Correct Response Path
+            // Gemini text is at: candidates[0] -> content -> parts[0] -> text
             return rootNode.path("candidates")
                     .get(0)
-                    .path("output")
+                    .path("content")
+                    .path("parts")
+                    .get(0)
+                    .path("text")
                     .asText();
         } catch (Exception e) {
-            return "Error processing request: " + e.getMessage();
+            return "Error parsing API response: " + e.getMessage();
         }
     }
 
     private String buildPrompt(EmailRequest emailRequest) {
         StringBuilder prompt = new StringBuilder();
-        prompt.append("Generate a professional email reply for the following content. Please don't generate a subject line. ");
+        prompt.append("Generate a professional email reply for the following content. Do not include a subject line. ");
 
         if (emailRequest.getTone() != null && !emailRequest.getTone().isEmpty()) {
-            prompt.append("Use a ").append(emailRequest.getTone()).append(" tone. ");
+            prompt.append("Tone: ").append(emailRequest.getTone()).append(". ");
         }
 
-        prompt.append("\nOriginal email:\n")
-                .append(emailRequest.getEmailContent());
+        prompt.append("\nOriginal email:\n").append(emailRequest.getEmailContent());
 
         return prompt.toString();
     }
